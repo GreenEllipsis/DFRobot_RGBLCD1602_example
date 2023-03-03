@@ -54,7 +54,7 @@ esp_err_t DFRobot_RGBLCD1602::i2c_scan(const uint8_t addr)
     i2c_master_start(cmd);
     i2c_master_write_byte(cmd, (addr << 1) | I2C_MASTER_WRITE, 1);
     i2c_master_stop(cmd);
-    ret = i2c_master_cmd_begin(I2C_NUM_0, cmd, 10 / portTICK_PERIOD_MS);
+    ret = i2c_master_cmd_begin(_i2c_num, cmd, RGBLCD1602_COMMAND_DELAY_MS / portTICK_PERIOD_MS);
     i2c_cmd_link_delete(cmd);
     ESP_LOGD(_TAG, "i2c_scan(0x%2x) returning:%i", addr, (int)ret);
     return ret;
@@ -78,7 +78,7 @@ esp_err_t DFRobot_RGBLCD1602::init()
         _RGBAddr = RGBLCD1602_RGB_ADDRESS;
         REG_RED = 0x04;
         REG_GREEN = 0x03;
-        REG_BLUE = 0x02; // 0x02 in the original, but had to set it to 0x01 to work on my ESP32-WROOM and monochrome 1602Module BLWBBA. I dunno.
+        REG_BLUE = 0x02; 
     }
     else
     {
@@ -124,16 +124,16 @@ esp_err_t DFRobot_RGBLCD1602::display()
     return command(RGBLCD1602_DISPLAYCONTROL | _showControl);
 }
 
-// void DFRobot_RGBLCD1602::stopBlink()
-// {
-//     _showControl &= ~RGBLCD1602_BLINKON;
-//     command(RGBLCD1602_DISPLAYCONTROL | _showControl);
-// }
-// void DFRobot_RGBLCD1602::blink()
-// {
-//     _showControl |= RGBLCD1602_BLINKON;
-//     command(RGBLCD1602_DISPLAYCONTROL | _showControl);
-// }
+esp_err_t DFRobot_RGBLCD1602::stopBlink()
+{
+    _showControl &= ~RGBLCD1602_BLINKON;
+    return command(RGBLCD1602_DISPLAYCONTROL | _showControl);
+}
+esp_err_t DFRobot_RGBLCD1602::blink()
+{
+    _showControl |= RGBLCD1602_BLINKON;
+    return command(RGBLCD1602_DISPLAYCONTROL | _showControl);
+}
 
 esp_err_t DFRobot_RGBLCD1602::noCursor()
 {
@@ -181,30 +181,33 @@ esp_err_t DFRobot_RGBLCD1602::autoscroll(void)
     return command(RGBLCD1602_ENTRYMODESET | _showMode);
 }
 
-// void DFRobot_RGBLCD1602::customSymbol(uint8_t location, uint8_t charmap[])
-// {
+esp_err_t DFRobot_RGBLCD1602::customSymbol(uint8_t location, uint8_t charmap[])
+{
 
-//     location &= 0x7; // we only have 8 locations 0-7
-//     command(RGBLCD1602_SETCGRAMADDR | (location << 3));
-    
-    
-//     uint8_t data[9];
-//     data[0] = 0x40;
-//     for(int i=0; i<8; i++)
-//     {
-//         data[i+1] = charmap[i];
-//     }
-//     send(data, 9);
-// }
+    location &= 0x7; // we only have 8 locations 0-7
+    esp_err_t ret = command(RGBLCD1602_SETCGRAMADDR | (location << 3));
+    if (ret != ESP_OK)
+        return ret;
+
+    uint8_t data[9];
+    data[0] = 0x40;
+    for(int i=0; i<8; i++)
+    {
+        data[i+1] = charmap[i];
+    }
+    return i2c_master_write_to_device(_i2c_num, _lcdAddr,
+                                      data, 9,
+                                      5 / portTICK_PERIOD_MS);
+}
 
 esp_err_t DFRobot_RGBLCD1602::setCursor(uint8_t col, uint8_t row)
 {
 
     col = (row == 0 ? col|0x80 : col|0xc0);
     const uint8_t data[] = {0x80, col};
-    return i2c_master_write_to_device(I2C_NUM_0, _lcdAddr,
+    return i2c_master_write_to_device(_i2c_num, _lcdAddr,
                                data, 2,
-                               10 / portTICK_PERIOD_MS);
+                               RGBLCD1602_COMMAND_DELAY_MS / portTICK_PERIOD_MS);
 }
 
 esp_err_t DFRobot_RGBLCD1602::setRGB(uint8_t r, uint8_t g, uint8_t b)
@@ -238,10 +241,11 @@ esp_err_t DFRobot_RGBLCD1602::noBlinkLED(void)
 inline size_t DFRobot_RGBLCD1602::write(uint8_t value)
 {
 
+    // TEST const uint8_t data[] = {0x40, value, 0};
     const uint8_t data[] = {0x40, value};
-    esp_err_t ret = i2c_master_write_to_device(I2C_NUM_0, _lcdAddr,
-                               data, 2,
-                               10 / portTICK_PERIOD_MS);
+    esp_err_t ret = i2c_master_write_to_device(_i2c_num, _lcdAddr,
+                                               data, 2,
+                                               RGBLCD1602_COMMAND_DELAY_MS / portTICK_PERIOD_MS);
     if (ret == ESP_OK)
     {
         return 1;
@@ -257,7 +261,7 @@ inline esp_err_t DFRobot_RGBLCD1602::command(uint8_t value)
     const uint8_t data[] = {0x80, value};
     return i2c_master_write_to_device(_i2c_num, _lcdAddr,
                                              data, 2,
-                                             10 / portTICK_PERIOD_MS);
+                                             RGBLCD1602_COMMAND_DELAY_MS / portTICK_PERIOD_MS);
 }
 
 void DFRobot_RGBLCD1602::print(const char *str)
@@ -351,14 +355,14 @@ esp_err_t DFRobot_RGBLCD1602::begin( uint8_t rows, uint8_t charSize)
 //     // _pWire->endTransmission();                     // stop transmitting
 //     return i2c_master_write_to_device(_i2c_num, _lcdAddr,
 //                                       data, len,
-//                                       10 / portTICK_PERIOD_MS);
+//                                       RGBLCD1602_COMMAND_DELAY_MS / portTICK_PERIOD_MS);
 // }
 
 esp_err_t DFRobot_RGBLCD1602::setReg(uint8_t addr, uint8_t data)
 {
     ESP_LOGD(_TAG, "i2c_master_write_to_device(port:%i, addr:0x%02x, reg:0x%02x, data:0x%02x)", _i2c_num, _RGBAddr, addr, data);
     const uint8_t write_buffer[] = {addr, data};
-    return i2c_master_write_to_device(I2C_NUM_0, _RGBAddr,
+    return i2c_master_write_to_device(_i2c_num, _RGBAddr,
                                         write_buffer, 2,
-                                        10 / portTICK_PERIOD_MS);
+                                        RGBLCD1602_COMMAND_DELAY_MS / portTICK_PERIOD_MS);
 }

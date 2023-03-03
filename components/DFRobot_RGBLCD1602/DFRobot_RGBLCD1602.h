@@ -49,6 +49,7 @@
 #define RGBLCD1602_FUNCTIONSET 0x20
 #define RGBLCD1602_SETCGRAMADDR 0x40
 #define RGBLCD1602_SETDDRAMADDR 0x80
+#define RGBLCD1602_COMMAND_DELAY_MS 5
 
 /*!
  *  @brief flags for display entry mode
