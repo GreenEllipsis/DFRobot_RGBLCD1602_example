@@ -197,15 +197,15 @@ esp_err_t DFRobot_RGBLCD1602::cursor()
 //     send(data, 9);
 // }
 
-// void DFRobot_RGBLCD1602::setCursor(uint8_t col, uint8_t row)
-// {
+esp_err_t DFRobot_RGBLCD1602::setCursor(uint8_t col, uint8_t row)
+{
 
-//     col = (row == 0 ? col|0x80 : col|0xc0);
-//     uint8_t data[3] = {0x80, col};
-
-//     send(data, 2);
-
-// }
+    col = (row == 0 ? col|0x80 : col|0xc0);
+    const uint8_t data[] = {0x80, col};
+    return i2c_master_write_to_device(I2C_NUM_0, _lcdAddr,
+                               data, 2,
+                               10 / portTICK_PERIOD_MS);
+}
 
 esp_err_t DFRobot_RGBLCD1602::setRGB(uint8_t r, uint8_t g, uint8_t b)
 {
@@ -260,7 +260,13 @@ inline esp_err_t DFRobot_RGBLCD1602::command(uint8_t value)
                                              10 / portTICK_PERIOD_MS);
 }
 
-
+void DFRobot_RGBLCD1602::print(const char *str)
+{
+    while (*str)
+    {
+        write(*str++);
+    }
+}
 
 // void DFRobot_RGBLCD1602::setBacklight(bool mode){
 // 	if(mode){

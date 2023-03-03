@@ -269,7 +269,11 @@ public:
      */
     esp_err_t setBacklight(bool mode);
 
-    //TODO: using Print::write;
+    /**
+     * @brief write a string
+     * 
+     */
+    void print(const char *str);
 
   private:
     /**
