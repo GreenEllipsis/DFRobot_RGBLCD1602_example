@@ -275,6 +275,12 @@ public:
      */
     void print(const char *str);
 
+    /**
+     * @brief write an int
+     *
+     */
+    void print(const int i);
+
   private:
     /**
      *  @brief the initialization function

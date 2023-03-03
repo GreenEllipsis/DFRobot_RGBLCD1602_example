@@ -57,13 +57,58 @@ extern "C" void app_main(void)
     ESP_ERROR_CHECK(lcd.init());
     
     /* Demonstrate writing settings the background color/intensity */
-    ESP_ERROR_CHECK(lcd.setRGB(colorR, colorG, colorB));
+    for (uint8_t i = 255; i > 0; i--)
+    {
+        ESP_ERROR_CHECK(lcd.setRGB(colorR, colorG, i));
+        // vTaskDelay(pdMS_TO_TICKS(1));
+    }
+    for (uint8_t i = 0; i < 255; i++)
+    {
+        ESP_ERROR_CHECK(lcd.setRGB(colorR, colorG, i));
+        // vTaskDelay(pdMS_TO_TICKS(1));
+    }
 
-    // finally, let's write to the display!
-    lcd.setCursor(3, 0);
-    lcd.print("Hello, world!");
-    lcd.setCursor(2, 1);
 
-    ESP_ERROR_CHECK(i2c_driver_delete(I2C_MASTER_NUM));
-    ESP_LOGI(TAG, "I2C de-initialized successfully");
+        // finally, let's write to the display!
+        lcd.setCursor(3, 0);
+        lcd.print("Hello, world!");
+        lcd.setCursor(2, 1);
+        vTaskDelay(pdMS_TO_TICKS(1000));
+
+        // now do an autoroll, whatever that is
+        lcd.clear();
+        lcd.setCursor(0, 0);
+        // print from 0 to 9:
+        for (int thisChar = 0; thisChar < 10; thisChar++)
+        {
+            lcd.print(thisChar);
+            vTaskDelay(pdMS_TO_TICKS(500));
+        }
+
+        lcd.setCursor(16, 1); // set the cursor to (16,1):
+
+        /**
+         *  @brief This will 'right justify' text from the showCursor
+         */
+        lcd.autoscroll(); // set the show to automatically scroll
+        // print from 0 to 9:
+        for (int thisChar = 0; thisChar < 10; thisChar++)
+        {
+            lcd.print(thisChar);
+            vTaskDelay(pdMS_TO_TICKS(500));
+        }
+
+        /**
+         *  @brief This will 'left justify' text from the showCursor
+         */
+        lcd.noAutoscroll(); // turn off automatic scrolling
+
+        /**
+         *  @brief clear the display and return the cursor to the initial position (position 0)
+         */
+        lcd.clear(); // clear screen for the next loop
+        
+        // the fun is over
+        ESP_ERROR_CHECK(i2c_driver_delete(I2C_MASTER_NUM));
+        ESP_LOGI(TAG, "I2C de-initialized successfully");
 }

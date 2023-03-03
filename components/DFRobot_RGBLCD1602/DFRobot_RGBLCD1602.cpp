@@ -78,7 +78,7 @@ esp_err_t DFRobot_RGBLCD1602::init()
         _RGBAddr = RGBLCD1602_RGB_ADDRESS;
         REG_RED = 0x04;
         REG_GREEN = 0x03;
-        REG_BLUE = 0x01; // 0x02 in the original, but had to set it to 0x01 to work on my ESP32-WROOM and monochrome 1602Module BLWBBA. I dunno.
+        REG_BLUE = 0x02; // 0x02 in the original, but had to set it to 0x01 to work on my ESP32-WROOM and monochrome 1602Module BLWBBA. I dunno.
     }
     else
     {
@@ -169,17 +169,17 @@ esp_err_t DFRobot_RGBLCD1602::cursor()
 //     command(RGBLCD1602_ENTRYMODESET | _showMode);
 // }
 
-// void DFRobot_RGBLCD1602::noAutoscroll(void)
-// {
-//     _showMode &= ~RGBLCD1602_ENTRYSHIFTINCREMENT;
-//     command(RGBLCD1602_ENTRYMODESET | _showMode);
-// }
+esp_err_t DFRobot_RGBLCD1602::noAutoscroll(void)
+{
+    _showMode &= ~RGBLCD1602_ENTRYSHIFTINCREMENT;
+    return command(RGBLCD1602_ENTRYMODESET | _showMode);
+}
 
-// void DFRobot_RGBLCD1602::autoscroll(void)
-// {
-//     _showMode |= RGBLCD1602_ENTRYSHIFTINCREMENT;
-//     command(RGBLCD1602_ENTRYMODESET | _showMode);
-// }
+esp_err_t DFRobot_RGBLCD1602::autoscroll(void)
+{
+    _showMode |= RGBLCD1602_ENTRYSHIFTINCREMENT;
+    return command(RGBLCD1602_ENTRYMODESET | _showMode);
+}
 
 // void DFRobot_RGBLCD1602::customSymbol(uint8_t location, uint8_t charmap[])
 // {
@@ -221,19 +221,19 @@ esp_err_t DFRobot_RGBLCD1602::setRGB(uint8_t r, uint8_t g, uint8_t b)
 //     setRGB(color_define[color][0], color_define[color][1], color_define[color][2]);
 // }
 
-// void DFRobot_RGBLCD1602::blinkLED(void)
-// {
-//     ///< blink period in seconds = (<reg 7> + 1) / 24
-//     ///< on/off ratio = <reg 6> / 256
-//     setReg(0x07, 0x17);  // blink every second
-//     setReg(0x06, 0x7f);  // half on, half off
-// }
+esp_err_t DFRobot_RGBLCD1602::blinkLED(void)
+{
+    ///< blink period in seconds = (<reg 7> + 1) / 24
+    ///< on/off ratio = <reg 6> / 256
+    setReg(0x07, 0x17);  // blink every second
+    return setReg(0x06, 0x7f);  // half on, half off
+}
 
-// void DFRobot_RGBLCD1602::noBlinkLED(void)
-// {
-//     setReg(0x07, 0x00);
-//     setReg(0x06, 0xff);
-// }
+esp_err_t DFRobot_RGBLCD1602::noBlinkLED(void)
+{
+    setReg(0x07, 0x00);
+    return setReg(0x06, 0xff);
+}
 
 inline size_t DFRobot_RGBLCD1602::write(uint8_t value)
 {
@@ -266,6 +266,12 @@ void DFRobot_RGBLCD1602::print(const char *str)
     {
         write(*str++);
     }
+}
+void DFRobot_RGBLCD1602::print(const int i)
+{
+    char str[7];
+    sprintf(str, "%i", i);
+    print(str);
 }
 
 // void DFRobot_RGBLCD1602::setBacklight(bool mode){
