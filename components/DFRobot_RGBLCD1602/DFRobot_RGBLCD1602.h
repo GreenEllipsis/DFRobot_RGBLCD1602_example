@@ -86,7 +86,7 @@
 #define RGBLCD1602_5x10DOTS 0x04
 #define RGBLCD1602_5x8DOTS 0x00
 
-class DFRobot_RGBLCD1602
+class DFRobot_RGBLCD1602 // : public Print  --yeah don't know if I'll be able to extend Arduino's print
 {
 private:
     static constexpr const char *_TAG = "DFRobot_RGBLCD1602";
@@ -125,27 +125,6 @@ public:
         uint8_t lcdAddr = RGBLCD1602_LCD_ADDRESS, uint8_t RGBAddr = RGBLCD1602_RGB_ADDRESS);
 
     // -----------------------------------------------------------------------------
-    // begin(uint8_t address, uint8_t resetPin): This function initializes the instance.
-    //  	It requires wire to already be begun (previous versions did not do this), resets the IC, and tries to read some
-    //  	registers to prove it's connected.
-    // Inputs:
-    //		- slave_addr should be the 7-bit address of the device. This should be
-    //		 one of four values - 0x3E, 0x3F, 0x70, 0x71 - all depending on what the
-    //		 ADDR0 and ADDR1 pins ar se to. This variable is required.
-    //		
-    // Output: Returns a ESP_OK if communication is successful, ESP_ERR on error.
-    // -----------------------------------------------------------------------------
-    esp_err_t begin(uint16_t slave_addr, int sda_io_num, int scl_io_num);
-
-    // -----------------------------------------------------------------------------
-    // end(): This function unistalls the I2C driver for the device so a different
-    //      driver can use the I2C bus
-    // Output: Returns the result of i2c_driver_delete()
-    // I2C_NUM_0 is hard coded
-    // -----------------------------------------------------------------------------
-    esp_err_t end();
-
-    // -----------------------------------------------------------------------------
     // init()
     // test communications
     // -----------------------------------------------------------------------------
@@ -155,14 +134,7 @@ public:
 
 
 
-// class DFRobot_RGBLCD1602 : public Print 
-// {
 
-// public:
-//   /**
-//    *  @brief Constructor
-//    */
-//   DFRobot_RGBLCD1602(uint8_t lcdCols,uint8_t lcdRows,TwoWire *pWire=&Wire,uint8_t lcdAddr=LCD_ADDRESS,uint8_t RGBAddr=RGB_ADDRESS);
 
 //   /**
 //    *  @brief clear the display and return the cursor to the initial position (position 0)
@@ -174,15 +146,15 @@ public:
 //    */
 //   void home();
 
-//     /**
-//      *  @brief Turn off the display
-//      */
-//   esp_err_t noDisplay();
+    /**
+     *  @brief Turn off the display
+     */
+  esp_err_t noDisplay();
 
-//   /**
-//    *  @brief Turn on the display
-//    */
-//   esp_err_t display();
+  /**
+   *  @brief Turn on the display
+   */
+  esp_err_t display();
 
 //   /**
 //    *  @brief Turn  off the blinking showCursor
@@ -194,112 +166,112 @@ public:
 //    */
 //   void blink();
 
-//   /**
-//    *  @brief Turn off the underline showCursor 
-//    */
-//   void noCursor();
+  /**
+   *  @brief Turn off the underline showCursor 
+   */
+  esp_err_t noCursor();
 
-//   /**
-//    *  @brief Turn on the underline showCursor 
-//    */
-//   void cursor();
+  /**
+   *  @brief Turn on the underline showCursor 
+   */
+  esp_err_t cursor();
 
-//   /**
-//    *  @brief scroll left to display
-//    */
-//   void scrollDisplayLeft();
+  //   /**
+  //    *  @brief scroll left to display
+  //    */
+  //   void scrollDisplayLeft();
 
-//   /**
-//    *  @brief scroll right to display
-//    */
-//   void scrollDisplayRight();
- 
-//   /**
-//    *  @brief This is for text that flows Left to Right
-//    */
-//   void leftToRight();
- 
-//   /**
-//    *  @brief This is for text that flows Right to Left
-//    */
-//   void rightToLeft();
+  //   /**
+  //    *  @brief scroll right to display
+  //    */
+  //   void scrollDisplayRight();
 
-//   /**
-//    *  @brief This will 'left justify' text from the showCursor
-//    */
-//   void noAutoscroll();
- 
-//   /**
-//    *  @brief This will 'right justify' text from the showCursor
-//    */
-//   void autoscroll();
-   
-//   /**
-//    *  @brief Allows us to fill the first 8 CGRAM locations with custom characters
-//    *  @param location substitute character range (0-7)
-//    *  @param charmap  character array the size is 8 bytes
-//    */
-//   void customSymbol(uint8_t location, uint8_t charmap[]);
+  //   /**
+  //    *  @brief This is for text that flows Left to Right
+  //    */
+  //   void leftToRight();
 
-//   /**
-//    *  @brief set cursor position
-//    *  @param col columns optional range 0-15
-//    *  @param row rows optional range 0-1，0 is the first row, 1 is the second row
-//    */
-//   void setCursor(uint8_t col, uint8_t row);
-  
-    /**
-     *  @brief set RGB
-     *  @param r  red   range(0-255)
-     *  @param g  green range(0-255)
-     *  @param b  blue  range(0-255)
-     */
-    esp_err_t setRGB(uint8_t r, uint8_t g, uint8_t b);
+  //   /**
+  //    *  @brief This is for text that flows Right to Left
+  //    */
+  //   void rightToLeft();
 
-//   /**
-//    *  @brief set backlight PWM output
-//    *  @param color  backlight color  Preferences：REG_RED\REG_GREEN\REG_BLUE
-//    *  @param pwm  color intensity   range(0-255)
-//    */
-//   void setPWM(uint8_t color, uint8_t pwm){setReg(color, pwm);}      // set pwm
+  //   /**
+  //    *  @brief This will 'left justify' text from the showCursor
+  //    */
+  //   void noAutoscroll();
 
-//   /**
-//    *  @brief backlight color
-//    *  @param color  backlight color  Preferences： WHITE\RED\GREEN\BLUE
-//    */
-//   void setColor(uint8_t color);
+  //   /**
+  //    *  @brief This will 'right justify' text from the showCursor
+  //    */
+  //   void autoscroll();
 
-//   /**
-//    *  @brief close the backlight
-//    */
-//   void closeBacklight(){setRGB(0, 0, 0);}
+  //   /**
+  //    *  @brief Allows us to fill the first 8 CGRAM locations with custom characters
+  //    *  @param location substitute character range (0-7)
+  //    *  @param charmap  character array the size is 8 bytes
+  //    */
+  //   void customSymbol(uint8_t location, uint8_t charmap[]);
 
-//   /**
-//    *  @brief set the backlight to white
-//    */
-//   void setColorWhite(){setRGB(255,255 , 255);}
+  //   /**
+  //    *  @brief set cursor position
+  //    *  @param col columns optional range 0-15
+  //    *  @param row rows optional range 0-1，0 is the first row, 1 is the second row
+  //    */
+  //   void setCursor(uint8_t col, uint8_t row);
 
-//   /**
-//    *  @brief blink the LED backlight
-//    */
-//   void blinkLED(void);
+  /**
+   *  @brief set RGB
+   *  @param r  red   range(0-255)
+   *  @param g  green range(0-255)
+   *  @param b  blue  range(0-255)
+   */
+  esp_err_t setRGB(uint8_t r, uint8_t g, uint8_t b);
 
-//   /**
-//    *  @brief the LED backlight doesn't blink
-//    */
-//   void noBlinkLED(void);
+  //   /**
+  //    *  @brief set backlight PWM output
+  //    *  @param color  backlight color  Preferences：REG_RED\REG_GREEN\REG_BLUE
+  //    *  @param pwm  color intensity   range(0-255)
+  //    */
+  //   void setPWM(uint8_t color, uint8_t pwm){setReg(color, pwm);}      // set pwm
 
-//   /**
-//    *  @brief write character
-//    *  @param data the written data
-//    */
-//   virtual size_t write(uint8_t data);
+  //   /**
+  //    *  @brief backlight color
+  //    *  @param color  backlight color  Preferences： WHITE\RED\GREEN\BLUE
+  //    */
+  //   void setColor(uint8_t color);
+
+  //   /**
+  //    *  @brief close the backlight
+  //    */
+  //   void closeBacklight(){setRGB(0, 0, 0);}
+
+  //   /**
+  //    *  @brief set the backlight to white
+  //    */
+  //   void setColorWhite(){setRGB(255,255 , 255);}
+
+  //   /**
+  //    *  @brief blink the LED backlight
+  //    */
+  //   void blinkLED(void);
+
+  //   /**
+  //    *  @brief the LED backlight doesn't blink
+  //    */
+  //   void noBlinkLED(void);
+
+  //   /**
+  //    *  @brief write character
+  //    *  @param data the written data
+  //    */
+  //   virtual size_t write(uint8_t data);
 
   /**
    *  @brief send command
    *  @param data the sent command
    */
-//   esp_err_t command(uint8_t data);
+  esp_err_t command(uint8_t data);
 
 //   /**
 //    *  @brief set the backlight
@@ -322,7 +294,7 @@ public:
    *  @param data the data to send
    *  @param len length of the data
    */
-//   esp_err_t send(const uint8_t *data, uint8_t len);
+  esp_err_t send(const uint8_t *data, uint8_t len);
 
 //   /**
 //    *  @brief set the register
@@ -331,7 +303,7 @@ public:
 //    */
   esp_err_t setReg(uint8_t addr, uint8_t data);
 //   uint8_t _showFunction;
-//   uint8_t _showControl;
+  uint8_t _showControl;
 //   uint8_t _showMode;
 //   uint8_t _initialized;
 //   uint8_t _numLines,_currLine;

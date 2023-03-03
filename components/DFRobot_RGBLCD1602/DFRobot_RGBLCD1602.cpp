@@ -78,7 +78,7 @@ esp_err_t DFRobot_RGBLCD1602::init()
         _RGBAddr = RGBLCD1602_RGB_ADDRESS;
         REG_RED = 0x04;
         REG_GREEN = 0x03;
-        REG_BLUE = 0x01; // 0x02 in the original, but had to set it to 0x01 to work on my ESP32-WROOM. I dunno.
+        REG_BLUE = 0x01; // 0x02 in the original, but had to set it to 0x01 to work on my ESP32-WROOM and monochrome 1602Module BLWBBA. I dunno.
     }
     else
     {
@@ -110,17 +110,17 @@ esp_err_t DFRobot_RGBLCD1602::init()
 //     delayMicroseconds(2000);        // this command takes a long time!
 // // }
 
-// esp_err_t DFRobot_RGBLCD1602::noDisplay()
-// {
-//     _showControl &= ~RGBLCD1602_DISPLAYON;
-//     return command(RGBLCD1602_DISPLAYCONTROL | _showControl);
-// }
+esp_err_t DFRobot_RGBLCD1602::noDisplay()
+{
+    _showControl &= ~RGBLCD1602_DISPLAYON;
+    return command(RGBLCD1602_DISPLAYCONTROL | _showControl);
+}
 
-// esp_err_t DFRobot_RGBLCD1602::display() 
-// {
-//     _showControl |= RGBLCD1602_DISPLAYON;
-//     return command(RGBLCD1602_DISPLAYCONTROL | _showControl);
-// }
+esp_err_t DFRobot_RGBLCD1602::display() 
+{
+    _showControl |= RGBLCD1602_DISPLAYON;
+    return command(RGBLCD1602_DISPLAYCONTROL | _showControl);
+}
 
 // void DFRobot_RGBLCD1602::stopBlink()
 // {
@@ -133,16 +133,17 @@ esp_err_t DFRobot_RGBLCD1602::init()
 //     command(RGBLCD1602_DISPLAYCONTROL | _showControl);
 // }
 
-// void DFRobot_RGBLCD1602::noCursor()
-// {
-//     _showControl &= ~RGBLCD1602_CURSORON;
-//     command(RGBLCD1602_DISPLAYCONTROL | _showControl);
-// }
+esp_err_t DFRobot_RGBLCD1602::noCursor()
+{
+    _showControl &= ~RGBLCD1602_CURSORON;
+    return command(RGBLCD1602_DISPLAYCONTROL | _showControl);
+}
 
-// void DFRobot_RGBLCD1602::cursor() {
-//     _showControl |= RGBLCD1602_CURSORON;
-//     command(RGBLCD1602_DISPLAYCONTROL | _showControl);
-// }
+esp_err_t DFRobot_RGBLCD1602::cursor()
+{
+    _showControl |= RGBLCD1602_CURSORON;
+    return command(RGBLCD1602_DISPLAYCONTROL | _showControl);
+}
 
 // void DFRobot_RGBLCD1602::scrollDisplayLeft(void)
 // {
@@ -240,13 +241,13 @@ esp_err_t DFRobot_RGBLCD1602::setRGB(uint8_t r, uint8_t g, uint8_t b)
 //     return 1; // assume sucess
 // }
 
-// inline esp_err_t DFRobot_RGBLCD1602::command(uint8_t value)
-// {
-//     uint8_t data[] = {0x80, value};
-//     return i2c_master_write_to_device(_i2c_num, _lcdAddr,
-//                                              &data, 2,
-//                                              10 / portTICK_PERIOD_MS);
-// }
+inline esp_err_t DFRobot_RGBLCD1602::command(uint8_t value)
+{
+    const uint8_t data[] = {0x80, value};
+    return i2c_master_write_to_device(_i2c_num, _lcdAddr,
+                                             data, 2,
+                                             10 / portTICK_PERIOD_MS);
+}
 
 
 

@@ -60,15 +60,21 @@ extern "C" void app_main(void)
     ESP_ERROR_CHECK(lcd.setRGB(colorR, colorG, colorB));
 
     vTaskDelay(pdMS_TO_TICKS(1000));
-    // while(true)
-    // {
-    //     vTaskDelay(pdMS_TO_TICKS(1000));
-    //     ESP_LOGI(TAG, "noDisplay");
-    //     ESP_ERROR_CHECK(lcd.noDisplay());
-    //     vTaskDelay(pdMS_TO_TICKS(1000));
-    //     ESP_LOGI(TAG, "display");
-    //     ESP_ERROR_CHECK(lcd.display());
-    // }
+    while(true)
+    {
+        ESP_LOGI(TAG, "noDisplay");
+        ESP_ERROR_CHECK(lcd.noDisplay());
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        ESP_LOGI(TAG, "display");
+        ESP_ERROR_CHECK(lcd.display());
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        ESP_LOGI(TAG, "noCursor");
+        ESP_ERROR_CHECK(lcd.noCursor());
+        vTaskDelay(pdMS_TO_TICKS(2000));
+        ESP_LOGI(TAG, "cursor");
+        ESP_ERROR_CHECK(lcd.cursor());
+        vTaskDelay(pdMS_TO_TICKS(2000));
+    }
 
     ESP_ERROR_CHECK(i2c_driver_delete(I2C_MASTER_NUM));
     ESP_LOGI(TAG, "I2C de-initialized successfully");
