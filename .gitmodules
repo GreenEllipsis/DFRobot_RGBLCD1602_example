@@ -1,0 +1,3 @@
+[submodule "components/DFRobot_RGBLCD1602"]
+	path = components/DFRobot_RGBLCD1602
+	url = https://github.com/GreenEllipsis/DFRobot_RGBLCD1602
