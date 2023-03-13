@@ -2,5 +2,5 @@
     "idf.adapterTargetName": "esp32",
     "idf.espIdfPathWin": "C:/Users/balano/esp/esp-idf/",
     "idf.flashType": "UART",
-    "idf.portWin": "COM16",
+    "idf.portWin": "COM7",
 }
